@@ -1,62 +1,60 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import * as courseActions from "../redux/actions/courseActions"
+import * as authorActions from "../redux/actions/authorActions"
 import { bindActionCreators } from 'redux'
 import PropTypes from 'prop-types'
+import CourseList from '../components/common/CourseList/index.jsx'
+
 
 class CoursesPage extends React.Component {
-    constructor(props) {
-        super(props) 
-
-        this.state = {
-            course: {
-                title: '',
-            }
+    
+    componentDidMount() {
+        const { courses, authors, actions } = this.props
+        if (courses.length === 0) {
+            actions.loadCourses()
+            .catch(error => console.error('Loading Courses Failed: ', error))   
         }
 
-        this.handleChange = this.handleChange.bind(this)
-        this.handleSubmit = this.handleSubmit.bind(this)
-    }
-
-    handleChange(e) {
-        const course = {...this.state.course, title: e.target.value}
-        this.setState({course})
-    }
-
-    handleSubmit(e) {
-        e.preventDefault()
-        this.props.actions.createCourse(this.state.course)
-        console.log('Submitted', this.state.course.title)
+        if (authors.length === 0) {
+            actions.loadAuthors()
+            .catch(error => console.error('Loading Authors Failed: ', error))
+        }
     }
 
     render() {
-        return <div>
-            <form onSubmit={this.handleSubmit}>
-                <h2>Courses Page</h2>
-                <h3>Add Course</h3>
-                <input type="text" onChange={this.handleChange} value={this.state.course.title} />
-                <input type="submit" value="Save" />
-            </form>
-            <div>
-                {this.props.courses && this.props.courses.map((item,index) => <h1 key={index}>{item.title}</h1>)}
-            </div>
-        </div>
+        console.log(this.props.authors, "data")
+        return <>
+            <h3>Courses</h3>
+            {this.props.courses && <CourseList 
+                courses={this.props.courses}
+                authors={this.props.authors} 
+            />}
+        </>
     }
 }
 
 CoursesPage.propTypes = {
     actions: PropTypes.object.isRequired,
-    courses: PropTypes.array.isRequired
+    courses: PropTypes.array.isRequired,
+    authors: PropTypes.array.isRequired,
 }
 
 const mapStateToProps = (state) => {
     console.log(state, "from redux")
-    return {courses: state.courses}
+    return {courses: state.authors.length === 0 ? [] : state.courses.map(course => ({
+        ...course,
+        authorName: state.authors.find(a => a.id === course.authorId).name
+    })),
+    authors: state.authors}
 }
 
 // benefit of not rewriting for specific action
 const mapDispatchToProps = (dispatch) => ({
-    actions: bindActionCreators(courseActions, dispatch)
+    actions: {
+        loadCourses: bindActionCreators(courseActions.loadCourses, dispatch),
+        loadAuthors: bindActionCreators(authorActions.loadAuthors, dispatch)
+    }
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(CoursesPage)
