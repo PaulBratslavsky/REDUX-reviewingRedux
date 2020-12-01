@@ -10,7 +10,8 @@ import HomePage from "./pages/home.page.jsx"
 import AboutPage from "./pages/about.page.jsx"
 import PageNotFound from "./pages/notfound.page.jsx"
 import Header from "./components/common/Header/index.jsx"
-import CoursesPage from "./pages/courses.page.jsx";
+import CoursesPage from "./pages/courses.page.jsx"
+import ManageCourse from "./pages/managecourse.page.jsx"
 
 const store = configureStore()
 
@@ -21,6 +22,8 @@ function App() {
       <Route path='/' exact component={HomePage} />
       <Route path='/about' component={AboutPage} />
       <Route path='/courses' component={CoursesPage} />
+      <Route path='/course/:slug' component={ManageCourse} />
+      <Route path='/course' component={ManageCourse} />
       <Route component={PageNotFound} />
     </Switch>
   </div>
